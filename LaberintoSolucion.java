@@ -145,7 +145,7 @@ public class LaberintoSolucion
         return aristas;
     }
 
-    /* 
+    
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         int ncasos = Integer.parseInt(sc.nextLine());
@@ -187,8 +187,9 @@ public class LaberintoSolucion
         }
         sc.close();
     }
-    */
+    
 
+    /* 
     public static void main(String[] args) {
         //Scanner sc = new Scanner(System.in);
         //int ncasos = Integer.parseInt(sc.nextLine());
@@ -221,4 +222,5 @@ public class LaberintoSolucion
         System.out.println(ans);
  
     }
+        */
 }
