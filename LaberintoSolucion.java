@@ -13,17 +13,17 @@ public class LaberintoSolucion
         int [][] acciones = new int[plataformas+1][energia+1];
 
         //Inicializo la tabla de acciones
-        for (int i = 1; i < plataformas; i++)
+        for (int i = 0; i <= plataformas; i++)
         {
             for (int j = 0; j <= energia; j++)
             {
-                if (i==1)
+                if (i==0)
                 {
                     acciones[i][j]=0;
                 }
                 else
                 {
-                    acciones[i][j]=Integer.MAX_VALUE;
+                    acciones[i][j]=Integer.MAX_VALUE - energia - 5;
                 }
             }
         }
@@ -51,7 +51,7 @@ public class LaberintoSolucion
             }
         }
         
-        int minAccion= Integer.MAX_VALUE;
+        int minAccion= Integer.MAX_VALUE - energia - 5;
         
         for (int i3=0; i3<=energia; i3++)
         {
@@ -62,7 +62,7 @@ public class LaberintoSolucion
         }
 
         String strAccion;
-        if (minAccion<Integer.MAX_VALUE)
+        if (minAccion<Integer.MAX_VALUE - energia - 5)
         {
             strAccion= String.valueOf(minAccion);
         }
@@ -82,9 +82,9 @@ public class LaberintoSolucion
         ArrayList<int[]> aristas = new ArrayList<int[]>();
 
 
-        for (int i = 1; i < plataformas; i++) 
+        for (int i = 0; i < plataformas; i++) 
         {
-            //Añado aristas de caminar adelante y atras
+            //Añado aristas de caminar adelante (y de paso de atras)
             if (!plataforma[i].equals("R") && !plataforma[i+1].equals("R") ) 
             {
                 int[] edge1= {i, i+1, 1, 0};
@@ -94,7 +94,7 @@ public class LaberintoSolucion
             }
             
             //Añado aristas de saltar
-            if (plataforma[i] != null && !plataforma[i].equals("R") )
+            if (!plataforma[i].equals("NA") && !plataforma[i].equals("R") )
             {
                 int numSaltos= Integer.parseInt(plataforma[i]);
                 if (i-numSaltos >=1)
@@ -120,10 +120,21 @@ public class LaberintoSolucion
             {
                 for (int i2 = 2; i2 <= energia; i2++)
                 {
-                    if (!plataforma[i2+i].equals("R"))
+                    if (i+i2<=plataformas)
                     {
-                        int[] edge={i, i2+i, 1, i2};
-                        aristas.add(edge);  
+                        if (!plataforma[i2+i].equals("R"))
+                        {
+                            int[] edge={i, i2+i, 1, i2};
+                            aristas.add(edge);  
+                        }
+                    }
+                    if (i-i2 >=1)
+                    {
+                        if (!plataforma[i-i2].equals("R"))
+                        {
+                            int[] edge={i, i-i2, 1, 0};
+                            aristas.add(edge);  
+                        }
                     }
                 }
             }
@@ -134,6 +145,7 @@ public class LaberintoSolucion
         return aristas;
     }
 
+    /* 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         int ncasos = Integer.parseInt(sc.nextLine());
@@ -159,7 +171,7 @@ public class LaberintoSolucion
             plataforma[n]="FIN";
 
             String ans = laberinto(n, e, plataforma);
-            /* 
+            
             ArrayList<String> camino = laberinto(n,e, plataforma);
             if (camino.isEmpty()) {
                 System.out.println("No hay camino");
@@ -171,9 +183,42 @@ public class LaberintoSolucion
                 }
                 System.out.println(movimientos);
             }
-                */
-            System.out.println(ans);
+            
         }
         sc.close();
+    }
+    */
+
+    public static void main(String[] args) {
+        //Scanner sc = new Scanner(System.in);
+        //int ncasos = Integer.parseInt(sc.nextLine());
+
+        int n = 14;
+        int e = 2;
+
+        String[] plataforma = new String[n+1];
+
+        String[] robots = "4 5 7 9 10 12".split(" ");
+
+        for (int i1 =0; i1 < plataforma.length; i1++)
+        {
+            plataforma[i1]="NA";
+        }
+        
+        for (String robot: robots) {
+            plataforma[Integer.parseInt(robot)] = "R";
+        }
+
+        String[] powerUps = "1 7 3 2 6 5 11 3".split(" ");
+        for (int i =0; i < powerUps.length;){
+            plataforma[Integer.parseInt(powerUps[i])] = powerUps[i+1];
+            i+=2;
+        }
+        plataforma[n]="FIN";
+
+        String ans = laberinto(n, e, plataforma);
+        
+        System.out.println(ans);
+ 
     }
 }
