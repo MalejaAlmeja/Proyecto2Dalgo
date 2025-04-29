@@ -1,16 +1,18 @@
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class LaberintoSolucion
 {
-    public static ArrayList<String> laberinto(int plataformas, int energia, String[] plataforma){
-        ArrayList<String> camino = new ArrayList<String>();
+    public static String laberinto(int plataformas, int energia, String[] plataforma){
+        String ans="NO SE PUEDE";
         //En plataforma, los valores posibles son: null (no hay nada), "R" (robot), "k" (plataformas que se pueden saltar) o "FIN" (llegada al villano final)
 
-        ArrayList<int[]> aristas =crearAristas(plataformas, energia, plataforma);
-        //La tabla de acciones es nodo x unidad de energia restante, y el valor adentro es el número de acciones mínimas
+        HashMap<Integer, String> tipoArista = new HashMap<Integer, String>();
+        ArrayList<int[]> aristas =crearAristas(plataformas, energia, plataforma, tipoArista);
+        //La tabla de acciones es nodo x unidad de energia restante, y el valor adentro es el número de acciones mínimas en pos 0, y acciones en pos 1
         int [][] acciones = new int[plataformas+1][energia+1];
+        String [][] track = new String[plataformas+1][energia+1];
 
         //Inicializo la tabla de acciones
         for (int i = 0; i <= plataformas; i++)
@@ -20,10 +22,12 @@ public class LaberintoSolucion
                 if (i==0)
                 {
                     acciones[i][j]=0;
+                    track[i][j]="";
                 }
                 else
                 {
                     acciones[i][j]=Integer.MAX_VALUE - energia - 5;
+                    track[i][j]="";
                 }
             }
         }
@@ -45,6 +49,8 @@ public class LaberintoSolucion
                     if (acciones[origen][iE]+costoNormal<acciones[destino][iE-costoEnergia])
                     {
                         acciones[destino][iE-costoEnergia]=acciones[origen][iE]+costoNormal;
+                        track[destino][iE-costoEnergia]=track[origen][iE]+tipoArista.get(edge[4])+" ";
+
                     }
                 }
                 
@@ -58,39 +64,35 @@ public class LaberintoSolucion
             if (acciones[plataformas][i3]<minAccion)
             {
                 minAccion= acciones[plataformas][i3];
+                ans=String.valueOf(minAccion)+" "+track[plataformas][i3];
             }
         }
 
-        String strAccion;
-        if (minAccion<Integer.MAX_VALUE - energia - 5)
-        {
-            strAccion= String.valueOf(minAccion);
-            for (int i=0 ; i<minAccion; i++)
-            {
-                camino.add("C+");
-            }
-        }
-
-        return camino;
+        return ans;
     }
 
     /*
-     * Crea una lista de aristas del siguiente formato: [origen, destino, costo normal, costo energia]
+     * Crea una lista de aristas del siguiente formato: [origen, destino, costo normal, costo energia, tipo]
      */
-    public static  ArrayList<int[]>  crearAristas(int plataformas, int energia, String[] plataforma)
+    public static  ArrayList<int[]>  crearAristas(int plataformas, int energia, String[] plataforma, HashMap<Integer, String> tipoArista)
     {
         ArrayList<int[]> aristas = new ArrayList<int[]>();
-
+        int numAristas=0;
 
         for (int i = 0; i < plataformas; i++) 
         {
             //Añado aristas de caminar adelante (y de paso de atras)
             if (!plataforma[i].equals("R") && !plataforma[i+1].equals("R") ) 
             {
-                int[] edge1= {i, i+1, 1, 0};
-                int[] edge2= {i+1, i, 1, 0};
+                numAristas++;
+                int[] edge1= {i, i+1, 1, 0, numAristas};
                 aristas.add(edge1);
+                tipoArista.put(numAristas, "C+");
+
+                numAristas++;
+                int[] edge2= {i+1, i, 1, 0, numAristas};
                 aristas.add(edge2);
+                tipoArista.put(numAristas, "C+");
             }
             
             //Añado aristas de saltar
@@ -101,16 +103,20 @@ public class LaberintoSolucion
                 {
                     if (!plataforma[i-numSaltos].equals("R"))
                     {
-                        int[] edge={i, i-numSaltos, 1, 0};
+                        numAristas++;
+                        int[] edge={i, i-numSaltos, 1, 0, numAristas};
                         aristas.add(edge);  
+                        tipoArista.put(numAristas, "S-");
                     }
                 }
                 if (i+numSaltos<=plataformas)
                 {
                     if (!plataforma[i+numSaltos].equals("R"))
                     {
-                        int[] edge={i, i+numSaltos, 1, 0};
+                        numAristas++;
+                        int[] edge={i, i+numSaltos, 1, 0, numAristas};
                         aristas.add(edge);  
+                        tipoArista.put(numAristas, "S+");
                     }
                 }
             }
@@ -124,16 +130,21 @@ public class LaberintoSolucion
                     {
                         if (!plataforma[i2+i].equals("R"))
                         {
-                            int[] edge={i, i2+i, 1, i2};
+                            numAristas++;
+                            int[] edge={i, i2+i, 1, i2, numAristas};
                             aristas.add(edge);  
+                            tipoArista.put(numAristas, "T"+String.valueOf(i2));
                         }
                     }
                     if (i-i2 >=1)
                     {
                         if (!plataforma[i-i2].equals("R"))
                         {
-                            int[] edge={i, i-i2, 1, 0};
+                            numAristas++;
+                            int[] edge={i, i-i2, 1, i2, numAristas};
                             aristas.add(edge);  
+                            tipoArista.put(numAristas, "T"+"-"+String.valueOf(i2));
+
                         }
                     }
                 }
@@ -142,7 +153,7 @@ public class LaberintoSolucion
         return aristas;
     }
 
-    
+    /* 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         int ncasos = Integer.parseInt(sc.nextLine());
@@ -167,24 +178,15 @@ public class LaberintoSolucion
             }
             plataforma[n]="FIN";
             
-            ArrayList<String> camino = laberinto(n,e, plataforma);
-            if (camino.isEmpty()) {
-                System.out.println("NO SE PUEDE");
-            } else {
-                String movimientos = new String();
-                movimientos += String.valueOf(camino.size()) + " ";
-                for (String elemento : camino) {
-                    movimientos+=elemento + " ";
-                }
-                System.out.println(movimientos);
-            }
+            String ans = laberinto(n,e, plataforma);
+            System.out.println(ans);
             
         }
         sc.close();
     }
-    
+    */
 
-    /* 
+    
     public static void main(String[] args) {
         //Scanner sc = new Scanner(System.in);
         //int ncasos = Integer.parseInt(sc.nextLine());
@@ -212,18 +214,9 @@ public class LaberintoSolucion
         }
         plataforma[n]="FIN";
 
-        ArrayList<String> camino = laberinto(n,e, plataforma);
-        if (camino.isEmpty()) {
-            System.out.println("NO SE PUEDE");
-        } else {
-            String movimientos = new String();
-            movimientos += String.valueOf(camino.size()) + " ";
-            for (String elemento : camino) {
-                movimientos+=elemento + " ";
-            }
-            System.out.println(movimientos);
-        }
+        String ans = laberinto(n,e, plataforma);
+        System.out.println(ans);
     }
-        */
+        
         
 }
