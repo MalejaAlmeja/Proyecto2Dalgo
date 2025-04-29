@@ -153,7 +153,7 @@ public class LaberintoSolucion
         return aristas;
     }
 
-    /* 
+     
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         int ncasos = Integer.parseInt(sc.nextLine());
@@ -165,6 +165,11 @@ public class LaberintoSolucion
 
             String[] plataforma = new String[n+1];
 
+            for (int i1 =0; i1 < plataforma.length; i1++)
+            {
+                plataforma[i1]="NA";
+            }
+            
             String[] robots = sc.nextLine().trim().split(" ");
             
             for (String robot: robots) {
@@ -184,7 +189,7 @@ public class LaberintoSolucion
         }
         sc.close();
     }
-    */
+    /* 
 
     
     public static void main(String[] args) {
@@ -217,6 +222,6 @@ public class LaberintoSolucion
         String ans = laberinto(n,e, plataforma);
         System.out.println(ans);
     }
-        
+        */
         
 }
