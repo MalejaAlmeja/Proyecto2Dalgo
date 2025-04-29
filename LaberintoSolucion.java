@@ -4,13 +4,74 @@ import java.util.Scanner;
 
 public class LaberintoSolucion
 {
-    public static ArrayList<String> laberinto(int plataformas, int energia, String[] plataforma){
+    public static String laberinto(int plataformas, int energia, String[] plataforma){
         ArrayList<String> camino = new ArrayList<String>();
         //En plataforma, los valores posibles son: null (no hay nada), "R" (robot), "k" (plataformas que se pueden saltar) o "FIN" (llegada al villano final)
 
         ArrayList<int[]> aristas =crearAristas(plataformas, energia, plataforma);
+        //La tabla de acciones es nodo x unidad de energia restante, y el valor adentro es el número de acciones mínimas
+        int [][] acciones = new int[plataformas+1][energia+1];
+
+        //Inicializo la tabla de acciones
+        for (int i = 1; i < plataformas; i++)
+        {
+            for (int j = 0; j <= energia; j++)
+            {
+                if (i==1)
+                {
+                    acciones[i][j]=0;
+                }
+                else
+                {
+                    acciones[i][j]=Integer.MAX_VALUE;
+                }
+            }
+        }
+
+        //CHEQUEA SI SI ES V-1 EN NUESTRO CASO O MENOS ITERACIONES
+        //Bellman-Ford editado 
+        for (int i = 1; i < plataformas; i++)
+        {
+            for (int numEdge = 0; numEdge < aristas.size(); numEdge++)
+            {
+                int[] edge= aristas.get(numEdge);
+                int origen= edge[0];
+                int destino= edge[1];
+                int costoNormal= edge[2];
+                int costoEnergia= edge[3];
+
+                for (int iE=energia; iE>=costoEnergia; iE--)
+                {
+                    if (acciones[origen][iE]+costoNormal<acciones[destino][iE-costoEnergia])
+                    {
+                        acciones[destino][iE-costoEnergia]=acciones[origen][iE]+costoNormal;
+                    }
+                }
+                
+            }
+        }
         
-        return camino;
+        int minAccion= Integer.MAX_VALUE;
+        
+        for (int i3=0; i3<=energia; i3++)
+        {
+            if (acciones[plataformas][i3]<minAccion)
+            {
+                minAccion= acciones[plataformas][i3];
+            }
+        }
+
+        String strAccion;
+        if (minAccion<Integer.MAX_VALUE)
+        {
+            strAccion= String.valueOf(minAccion);
+        }
+        else
+        {
+            strAccion= "NO SE PUEDE";
+        }
+
+        return strAccion;
     }
 
     /*
@@ -97,6 +158,8 @@ public class LaberintoSolucion
             }
             plataforma[n]="FIN";
 
+            String ans = laberinto(n, e, plataforma);
+            /* 
             ArrayList<String> camino = laberinto(n,e, plataforma);
             if (camino.isEmpty()) {
                 System.out.println("No hay camino");
@@ -108,6 +171,8 @@ public class LaberintoSolucion
                 }
                 System.out.println(movimientos);
             }
+                */
+            System.out.println(ans);
         }
         sc.close();
     }
