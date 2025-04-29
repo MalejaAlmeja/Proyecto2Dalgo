@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class LaberintoSolucion
 {
-    public static String laberinto(int plataformas, int energia, String[] plataforma){
+    public static ArrayList<String> laberinto(int plataformas, int energia, String[] plataforma){
         ArrayList<String> camino = new ArrayList<String>();
         //En plataforma, los valores posibles son: null (no hay nada), "R" (robot), "k" (plataformas que se pueden saltar) o "FIN" (llegada al villano final)
 
@@ -65,13 +65,13 @@ public class LaberintoSolucion
         if (minAccion<Integer.MAX_VALUE - energia - 5)
         {
             strAccion= String.valueOf(minAccion);
-        }
-        else
-        {
-            strAccion= "NO SE PUEDE";
+            for (int i=0 ; i<minAccion; i++)
+            {
+                camino.add("C+");
+            }
         }
 
-        return strAccion;
+        return camino;
     }
 
     /*
@@ -138,10 +138,7 @@ public class LaberintoSolucion
                     }
                 }
             }
-            
-
         }
-
         return aristas;
     }
 
@@ -169,15 +166,13 @@ public class LaberintoSolucion
                 i+=2;
             }
             plataforma[n]="FIN";
-
-            String ans = laberinto(n, e, plataforma);
             
             ArrayList<String> camino = laberinto(n,e, plataforma);
             if (camino.isEmpty()) {
-                System.out.println("No hay camino");
+                System.out.println("NO SE PUEDE");
             } else {
                 String movimientos = new String();
-                movimientos += camino.size() + " ";
+                movimientos += String.valueOf(camino.size()) + " ";
                 for (String elemento : camino) {
                     movimientos+=elemento + " ";
                 }
@@ -217,10 +212,18 @@ public class LaberintoSolucion
         }
         plataforma[n]="FIN";
 
-        String ans = laberinto(n, e, plataforma);
-        
-        System.out.println(ans);
- 
+        ArrayList<String> camino = laberinto(n,e, plataforma);
+        if (camino.isEmpty()) {
+            System.out.println("NO SE PUEDE");
+        } else {
+            String movimientos = new String();
+            movimientos += String.valueOf(camino.size()) + " ";
+            for (String elemento : camino) {
+                movimientos+=elemento + " ";
+            }
+            System.out.println(movimientos);
+        }
     }
         */
+        
 }
