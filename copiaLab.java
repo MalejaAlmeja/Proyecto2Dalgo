@@ -1,7 +1,7 @@
-import java.util.ArrayList;
+
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Scanner;
 
 
@@ -16,6 +16,7 @@ public class copiaLab
         int [][] acciones = new int[plataformas+1][energia+1];
         String [][] track = new String[plataformas+1][energia+1];
         Queue<int[]> cola = new LinkedList<int[]>();
+        HashSet<int[]> visitados = new HashSet<int[]>();
         //Cada elemento/nodo en la cola tiene la estructura (posicion actual, energia restante)
         //Inicializo la tabla de acciones
         for (int i = 0; i <= plataformas; i++)
@@ -42,7 +43,11 @@ public class copiaLab
             int[] plataformaActual= cola.remove();
             int origen= plataformaActual[0];
             int energiaRestante= plataformaActual[1];
-            //Llgamos al final, entonces nos salimos para hacer backtracking
+
+            if (visitados.contains(plataformaActual)){
+                continue;
+            }
+            //Llegamos al final, entonces nos salimos para hacer backtracking
             if (plataforma[origen].equals("FIN"))
             {
                 break;
@@ -60,6 +65,7 @@ public class copiaLab
                         acciones[plataformaAtras][energiaRestante]=acciones[origen][energiaRestante]+1;
                         track[plataformaAtras][energiaRestante]=track[origen][energiaRestante]+"C- ";
                         cola.add(new int[]{plataformaAtras, energiaRestante});
+                        visitados.add(new int[]{plataformaAtras, energiaRestante});
                     }
                 }
                 if (plataformaAdelante <= plataformas && !plataforma[plataformaAdelante].equals("R"))
@@ -69,6 +75,7 @@ public class copiaLab
                         acciones[plataformaAdelante][energiaRestante]=acciones[origen][energiaRestante]+1;
                         track[plataformaAdelante][energiaRestante]=track[origen][energiaRestante]+"C+ ";
                         cola.add(new int[]{plataformaAdelante, energiaRestante});
+                        visitados.add(new int[]{plataformaAdelante, energiaRestante});
                     }
                 }
             }
@@ -86,6 +93,7 @@ public class copiaLab
                         acciones[plataformaAtras][energiaRestante]=acciones[origen][energiaRestante]+1;
                         track[plataformaAtras][energiaRestante]=track[origen][energiaRestante]+"S- ";
                         cola.add(new int[]{plataformaAtras, energiaRestante});
+                        visitados.add(new int[]{plataformaAtras, energiaRestante});
                     }
                 }
                 if (plataformaAdelante <= plataformas && !plataforma[plataformaAdelante].equals("R"))
@@ -95,38 +103,45 @@ public class copiaLab
                         acciones[plataformaAdelante][energiaRestante]=acciones[origen][energiaRestante]+1;
                         track[plataformaAdelante][energiaRestante]=track[origen][energiaRestante]+"S+ ";
                         cola.add(new int[]{plataformaAdelante, energiaRestante});
+                        visitados.add(new int[]{plataformaAdelante, energiaRestante});
                     }
                 }
             }
 
             //Añado aristas de teletransportación
-            //TODO
-
-        }
-
-        //bellamnford
-        for (int i = 1; i < plataformas; i++)
-        {
-            for (int numEdge = 0; numEdge < aristas.size(); numEdge++)
+            if (energiaRestante>1)
             {
-                int[] edge= aristas.get(numEdge);
-                int origen= edge[0];
-                int destino= edge[1];
-                int costoNormal= edge[2];
-                int costoEnergia= edge[3];
-
-                for (int iE=energia; iE>=costoEnergia; iE--)
+                for (int iE=energiaRestante; iE>1; iE--)
                 {
-                    if (acciones[origen][iE]+costoNormal<acciones[destino][iE-costoEnergia])
+                    int plataformaAdelante = origen+iE;
+                    int plataformaAtras = origen-iE;
+                    if (plataformaAdelante <= plataformas && !plataforma[plataformaAdelante].equals("R"))
                     {
-                        acciones[destino][iE-costoEnergia]=acciones[origen][iE]+costoNormal;
-                        track[destino][iE-costoEnergia]=track[origen][iE]+tipoArista.get(edge[4])+" ";
-
+                        if (acciones[plataformaAdelante][energiaRestante-iE] > acciones[origen][iE]+1)
+                        {
+                            acciones[plataformaAdelante][energiaRestante-iE]=acciones[origen][iE]+1;
+                            track[plataformaAdelante][energiaRestante-iE]=track[origen][iE]+"T"+iE+" ";
+                            cola.add(new int[]{plataformaAdelante, energiaRestante-iE});
+                            visitados.add(new int[]{plataformaAdelante, energiaRestante-iE});
+                        }
                     }
+                    if (plataformaAtras >= 1 && !plataforma[plataformaAtras].equals("R"))
+                    {
+                        if (acciones[plataformaAtras][energiaRestante-iE] > acciones[origen][iE]+1)
+                        {
+                            acciones[plataformaAtras][energiaRestante-iE]=acciones[origen][iE]+1;
+                            track[plataformaAtras][energiaRestante-iE]=track[origen][iE]+"T-"+iE+" ";
+                            cola.add(new int[]{plataformaAtras, energiaRestante-iE});
+                            visitados.add(new int[]{plataformaAtras, energiaRestante-iE});
+                        }
+                    }
+                    
                 }
-                
+
             }
+
         }
+
 
         //Backtracking
         int minAccion= Integer.MAX_VALUE - energia - 5;
@@ -141,88 +156,6 @@ public class copiaLab
         }
 
         return ans;
-    }
-
-    /*
-     * Crea una lista de aristas del siguiente formato: [origen, destino, costo normal, costo energia, tipo]
-     */
-    public static  ArrayList<int[]>  crearAristas(int plataformas, int energia, String[] plataforma, HashMap<Integer, String> tipoArista)
-    {
-        ArrayList<int[]> aristas = new ArrayList<int[]>();
-        int numAristas=0;
-
-        for (int i = 0; i < plataformas; i++) 
-        {
-            //Añado aristas de caminar adelante (y de paso de atras)
-            if (!plataforma[i].equals("R") && !plataforma[i+1].equals("R") ) 
-            {
-                numAristas++;
-                int[] edge1= {i, i+1, 1, 0, numAristas};
-                aristas.add(edge1);
-                tipoArista.put(numAristas, "C+");
-
-                numAristas++;
-                int[] edge2= {i+1, i, 1, 0, numAristas};
-                aristas.add(edge2);
-                tipoArista.put(numAristas, "C+");
-            }
-            
-            //Añado aristas de saltar
-            if (!plataforma[i].equals("NA") && !plataforma[i].equals("R") )
-            {
-                int numSaltos= Integer.parseInt(plataforma[i]);
-                if (i-numSaltos >=1)
-                {
-                    if (!plataforma[i-numSaltos].equals("R"))
-                    {
-                        numAristas++;
-                        int[] edge={i, i-numSaltos, 1, 0, numAristas};
-                        aristas.add(edge);  
-                        tipoArista.put(numAristas, "S-");
-                    }
-                }
-                if (i+numSaltos<=plataformas)
-                {
-                    if (!plataforma[i+numSaltos].equals("R"))
-                    {
-                        numAristas++;
-                        int[] edge={i, i+numSaltos, 1, 0, numAristas};
-                        aristas.add(edge);  
-                        tipoArista.put(numAristas, "S+");
-                    }
-                }
-            }
-
-            //Añado aristas de teletransportación
-            if (!plataforma[i].equals("R") && energia>1)
-            {
-                for (int i2 = 2; i2 <= energia; i2++)
-                {
-                    if (i+i2<=plataformas)
-                    {
-                        if (!plataforma[i2+i].equals("R"))
-                        {
-                            numAristas++;
-                            int[] edge={i, i2+i, 1, i2, numAristas};
-                            aristas.add(edge);  
-                            tipoArista.put(numAristas, "T"+String.valueOf(i2));
-                        }
-                    }
-                    if (i-i2 >=1)
-                    {
-                        if (!plataforma[i-i2].equals("R"))
-                        {
-                            numAristas++;
-                            int[] edge={i, i-i2, 1, i2, numAristas};
-                            aristas.add(edge);  
-                            tipoArista.put(numAristas, "T"+"-"+String.valueOf(i2));
-
-                        }
-                    }
-                }
-            }
-        }
-        return aristas;
     }
 
      
