@@ -2,10 +2,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
-public class LaberintoSolucion
-{
+public class test {
     public static String laberinto(int plataformas, int energia, String[] plataforma){
-        String ans="NO SE PUEDE";
+        /*String ans="NO SE PUEDE";
         //En plataforma, los valores posibles son: null (no hay nada), "R" (robot), "k" (plataformas que se pueden saltar) o "FIN" (llegada al villano final)
 
         HashMap<Integer, String> tipoArista = new HashMap<Integer, String>();
@@ -69,6 +68,8 @@ public class LaberintoSolucion
         }
 
         return ans;
+        */
+        return "NO SE PUEDE";
     }
 
     /*
@@ -177,7 +178,7 @@ public class LaberintoSolucion
             for (String robot: robots) {
                 plataforma[Integer.parseInt(robot)] = "R";
             }
-
+                
             String[] powerUps = sc.nextLine().trim().split(" ");
             for (int i =0; i < powerUps.length;){
                 plataforma[Integer.parseInt(powerUps[i])] = powerUps[i+1];
@@ -191,39 +192,4 @@ public class LaberintoSolucion
         }
         sc.close();
     }
-    /* 
-
-    
-    public static void main(String[] args) {
-        //Scanner sc = new Scanner(System.in);
-        //int ncasos = Integer.parseInt(sc.nextLine());
-
-        int n = 14;
-        int e = 2;
-
-        String[] plataforma = new String[n+1];
-
-        String[] robots = "4 5 7 9 10 12".split(" ");
-
-        for (int i1 =0; i1 < plataforma.length; i1++)
-        {
-            plataforma[i1]="NA";
-        }
-        
-        for (String robot: robots) {
-            plataforma[Integer.parseInt(robot)] = "R";
-        }
-
-        String[] powerUps = "1 7 3 2 6 5 11 3".split(" ");
-        for (int i =0; i < powerUps.length;){
-            plataforma[Integer.parseInt(powerUps[i])] = powerUps[i+1];
-            i+=2;
-        }
-        plataforma[n]="FIN";
-
-        String ans = laberinto(n,e, plataforma);
-        System.out.println(ans);
-    }
-        */
-        
 }
