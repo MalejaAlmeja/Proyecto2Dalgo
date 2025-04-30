@@ -4,14 +4,20 @@ import java.util.Scanner;
 
 public class test {
     public static String laberinto(int plataformas, int energia, String[] plataforma){
-        /*String ans="NO SE PUEDE";
+        String ans="NO SE PUEDE";
         //En plataforma, los valores posibles son: null (no hay nada), "R" (robot), "k" (plataformas que se pueden saltar) o "FIN" (llegada al villano final)
+
+        if (energia>= plataformas)
+        {
+            return "1 T"+String.valueOf(plataformas);
+        }
 
         HashMap<Integer, String> tipoArista = new HashMap<Integer, String>();
         ArrayList<int[]> aristas =crearAristas(plataformas, energia, plataforma, tipoArista);
         //La tabla de acciones es nodo x unidad de energia restante, y el valor adentro es el número de acciones mínimas en pos 0, y acciones en pos 1
         int [][] acciones = new int[plataformas+1][energia+1];
         String [][] track = new String[plataformas+1][energia+1];
+
 
         //Inicializo la tabla de acciones
         for (int i = 0; i <= plataformas; i++)
@@ -31,6 +37,7 @@ public class test {
             }
         }
 
+        /* 
         //CHEQUEA SI SI ES V-1 EN NUESTRO CASO O MENOS ITERACIONES
         //Bellman-Ford editado 
         for (int i = 1; i < plataformas; i++)
@@ -43,6 +50,7 @@ public class test {
                 int costoNormal= edge[2];
                 int costoEnergia= edge[3];
 
+                
                 for (int iE=energia; iE>=costoEnergia; iE--)
                 {
                     if (acciones[origen][iE]+costoNormal<acciones[destino][iE-costoEnergia])
@@ -52,9 +60,19 @@ public class test {
 
                     }
                 }
+                    
+                int iE=costoEnergia;
+
+                if (acciones[origen][iE]+costoNormal<acciones[destino][iE-costoEnergia])
+                {
+                    acciones[destino][iE-costoEnergia]=acciones[origen][iE]+costoNormal;
+                    track[destino][iE-costoEnergia]=track[origen][iE]+tipoArista.get(edge[4])+" ";
+
+                }
                 
             }
         }
+        */
         
         int minAccion= Integer.MAX_VALUE - energia - 5;
         
@@ -68,8 +86,7 @@ public class test {
         }
 
         return ans;
-        */
-        return "NO SE PUEDE";
+        
     }
 
     /*

@@ -4,9 +4,14 @@ import java.util.Scanner;
 
 public class LaberintoSolucion
 {
-    public static String laberinto(int plataformas, int energia, String[] plataforma){
+    public static String laberinto(int plataformas, int energia, String[] plataforma, int numRobots){
         String ans="NO SE PUEDE";
         //En plataforma, los valores posibles son: null (no hay nada), "R" (robot), "k" (plataformas que se pueden saltar) o "FIN" (llegada al villano final)
+
+        if (energia>= plataformas)
+        {
+            return "1 T"+String.valueOf(plataformas);
+        }
 
         HashMap<Integer, String> tipoArista = new HashMap<Integer, String>();
         ArrayList<int[]> aristas =crearAristas(plataformas, energia, plataforma, tipoArista);
@@ -31,10 +36,9 @@ public class LaberintoSolucion
                 }
             }
         }
-
-        //CHEQUEA SI SI ES V-1 EN NUESTRO CASO O MENOS ITERACIONES
+        
         //Bellman-Ford editado 
-        for (int i = 1; i < plataformas; i++)
+        for (int i = 1; i < plataformas-numRobots; i++)
         {
             for (int numEdge = 0; numEdge < aristas.size(); numEdge++)
             {
@@ -185,7 +189,7 @@ public class LaberintoSolucion
             }
             plataforma[n]="FIN";
             
-            String ans = laberinto(n,e, plataforma);
+            String ans = laberinto(n,e, plataforma, robots.length);
             System.out.println(ans);
             
         }
