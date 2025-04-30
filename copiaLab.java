@@ -1,8 +1,7 @@
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.HashSet;
-import java.util.Scanner;
 
 
 public class copiaLab
@@ -154,11 +153,15 @@ public class copiaLab
                 ans=String.valueOf(minAccion)+" "+track[plataformas][i3];
             }
         }
+    //DEBUGGINGGGG:
+    imprimirMatrizAcciones(acciones);
+    imprimirMatrizTrack(track);
+    
 
         return ans;
     }
 
-     
+     /* 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
@@ -196,19 +199,19 @@ public class copiaLab
         }
         sc.close();
     }
-    /* 
+    */
 
     
     public static void main(String[] args) {
         //Scanner sc = new Scanner(System.in);
         //int ncasos = Integer.parseInt(sc.nextLine());
 
-        int n = 14;
+        int n = 9;
         int e = 2;
 
         String[] plataforma = new String[n+1];
 
-        String[] robots = "4 5 7 9 10 12".split(" ");
+        String[] robots = "4 5 7".split(" ");
 
         for (int i1 =0; i1 < plataforma.length; i1++)
         {
@@ -219,7 +222,7 @@ public class copiaLab
             plataforma[Integer.parseInt(robot)] = "R";
         }
 
-        String[] powerUps = "1 7 3 2 6 5 11 3".split(" ");
+        String[] powerUps = "1 4 3 3 6 5".split(" ");
         for (int i =0; i < powerUps.length;){
             plataforma[Integer.parseInt(powerUps[i])] = powerUps[i+1];
             i+=2;
@@ -228,7 +231,75 @@ public class copiaLab
 
         String ans = laberinto(n,e, plataforma);
         System.out.println(ans);
+        
     }
-        */
+
+
+    public static void imprimirMatrizTrack(String[][] track) {
+        int plataformas = track.length;
+        int energiaMax = track[0].length;
+    
+        // Encabezado de columnas
+        System.out.print("          ");
+        for (int energia = 0; energia < energiaMax; energia++) {
+            System.out.printf("Energía %-3d", energia);
+        }
+        System.out.println();
+    
+        // Separador
+        System.out.print("          ");
+        for (int energia = 0; energia < energiaMax; energia++) {
+            System.out.print("-----------");
+        }
+        System.out.println();
+    
+        // Filas (plataformas)
+        for (int plataforma = 0; plataforma < plataformas; plataforma++) {
+            System.out.printf("Plataforma %-2d|", plataforma);
+            for (int energia = 0; energia < energiaMax; energia++) {
+                String paso = (track[plataforma][energia] == null || track[plataforma][energia].isEmpty())
+                    ? "--"
+                    : track[plataforma][energia].trim();
+                if (paso.length() > 9) paso = paso.substring(paso.length() - 9);
+                System.out.printf(" %-9s", paso);
+            }
+            System.out.println();
+        }
+    }
+
+    
+    public static void imprimirMatrizAcciones(int[][] acciones) {
+        int filas = acciones.length;
+        int cols = acciones[0].length;
+    
+        // Encabezado de columnas (energía)
+        System.out.print("     ");
+        for (int j = 0; j < cols; j++) {
+            System.out.printf("E%2d ", j);
+        }
+        System.out.println();
+    
+        // Separador
+        System.out.print("     ");
+        for (int j = 0; j < cols; j++) {
+            System.out.print("----");
+        }
+        System.out.println();
+    
+        // Filas (plataformas)
+        for (int i = 0; i < filas; i++) {
+            System.out.printf("P%2d |", i);  // Etiqueta de fila
+            for (int j = 0; j < cols; j++) {
+                if (acciones[i][j] == Integer.MAX_VALUE - 100000) {
+                    System.out.print("  ∞ "); // Opcional: símbolo de infinito
+                } else {
+                    System.out.printf("%3d ", acciones[i][j]);
+                }
+            }
+            System.out.println();
+        }
+    }
+    
+        
         
 }
