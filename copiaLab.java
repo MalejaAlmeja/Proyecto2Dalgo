@@ -1,21 +1,17 @@
-
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
-
+import java.util.Scanner;
 
 public class copiaLab
 {
     public static String laberinto(int plataformas, int energia, String[] plataforma){
         String ans="NO SE PUEDE";
+        final int infinito = Integer.MAX_VALUE - energia - 5;
         //En plataforma, los valores posibles son: null (no hay nada), "R" (robot), "k" (plataformas que se pueden saltar) o "FIN" (llegada al villano final)
-
-    
-        //La tabla de acciones es nodo x unidad de energia restante, y el valor adentro es el número de acciones mínimas en pos 0, y acciones en pos 1
+        //La tabla de acciones es nodo x unidad de energia restante, y el valor adentro es el nÃºmero de acciones mÃ­nimas en pos 0, y acciones en pos 1
         int [][] acciones = new int[plataformas+1][energia+1];
         String [][] track = new String[plataformas+1][energia+1];
-        Queue<int[]> cola = new LinkedList<int[]>();
-        HashSet<int[]> visitados = new HashSet<int[]>();
+        Queue<int[]> cola = new LinkedList<>();
         //Cada elemento/nodo en la cola tiene la estructura (posicion actual, energia restante)
         //Inicializo la tabla de acciones
         for (int i = 0; i <= plataformas; i++)
@@ -29,7 +25,7 @@ public class copiaLab
                 }
                 else
                 {
-                    acciones[i][j]=Integer.MAX_VALUE - energia - 5;
+                    acciones[i][j]=infinito;
                     track[i][j]="";
                 }
             }
@@ -42,18 +38,13 @@ public class copiaLab
             int[] plataformaActual= cola.remove();
             int origen= plataformaActual[0];
             int energiaRestante= plataformaActual[1];
+            int acc= acciones[origen][energiaRestante];
 
-            if (visitados.contains(plataformaActual)){
-                continue;
-            }
-            //Llegamos al final, entonces nos salimos para hacer backtracking
-            if (plataforma[origen].equals("FIN"))
-            {
-                break;
-            }
-
-            //Añado aristas sin powerup
-            if (plataforma[origen].equals("NA"))
+            //Llegamos al final
+            if (plataforma[origen].equals("FIN")){return acc + " " + track[origen][energiaRestante].trim();}
+            
+            //AÃ±ado aristas sin powerup
+            if (plataforma[origen].equals("NA") ||  (!plataforma[origen].equals("R") && !plataforma[origen].equals("FIN")))
             {
                 int plataformaAtras = origen-1;
                 int plataformaAdelante = origen+1;
@@ -64,7 +55,6 @@ public class copiaLab
                         acciones[plataformaAtras][energiaRestante]=acciones[origen][energiaRestante]+1;
                         track[plataformaAtras][energiaRestante]=track[origen][energiaRestante]+"C- ";
                         cola.add(new int[]{plataformaAtras, energiaRestante});
-                        visitados.add(new int[]{plataformaAtras, energiaRestante});
                     }
                 }
                 if (plataformaAdelante <= plataformas && !plataforma[plataformaAdelante].equals("R"))
@@ -74,7 +64,6 @@ public class copiaLab
                         acciones[plataformaAdelante][energiaRestante]=acciones[origen][energiaRestante]+1;
                         track[plataformaAdelante][energiaRestante]=track[origen][energiaRestante]+"C+ ";
                         cola.add(new int[]{plataformaAdelante, energiaRestante});
-                        visitados.add(new int[]{plataformaAdelante, energiaRestante});
                     }
                 }
             }
@@ -92,7 +81,6 @@ public class copiaLab
                         acciones[plataformaAtras][energiaRestante]=acciones[origen][energiaRestante]+1;
                         track[plataformaAtras][energiaRestante]=track[origen][energiaRestante]+"S- ";
                         cola.add(new int[]{plataformaAtras, energiaRestante});
-                        visitados.add(new int[]{plataformaAtras, energiaRestante});
                     }
                 }
                 if (plataformaAdelante <= plataformas && !plataforma[plataformaAdelante].equals("R"))
@@ -102,12 +90,11 @@ public class copiaLab
                         acciones[plataformaAdelante][energiaRestante]=acciones[origen][energiaRestante]+1;
                         track[plataformaAdelante][energiaRestante]=track[origen][energiaRestante]+"S+ ";
                         cola.add(new int[]{plataformaAdelante, energiaRestante});
-                        visitados.add(new int[]{plataformaAdelante, energiaRestante});
                     }
                 }
             }
 
-            //Añado aristas de teletransportación
+            //AÃ±ado aristas de teletransportaciÃ³n
             if (energiaRestante>1)
             {
                 for (int iE=energiaRestante; iE>1; iE--)
@@ -121,7 +108,6 @@ public class copiaLab
                             acciones[plataformaAdelante][energiaRestante-iE]=acciones[origen][iE]+1;
                             track[plataformaAdelante][energiaRestante-iE]=track[origen][iE]+"T"+iE+" ";
                             cola.add(new int[]{plataformaAdelante, energiaRestante-iE});
-                            visitados.add(new int[]{plataformaAdelante, energiaRestante-iE});
                         }
                     }
                     if (plataformaAtras >= 1 && !plataforma[plataformaAtras].equals("R"))
@@ -131,37 +117,18 @@ public class copiaLab
                             acciones[plataformaAtras][energiaRestante-iE]=acciones[origen][iE]+1;
                             track[plataformaAtras][energiaRestante-iE]=track[origen][iE]+"T-"+iE+" ";
                             cola.add(new int[]{plataformaAtras, energiaRestante-iE});
-                            visitados.add(new int[]{plataformaAtras, energiaRestante-iE});
                         }
                     }
                     
                 }
 
             }
-
         }
-
-
-        //Backtracking
-        int minAccion= Integer.MAX_VALUE - energia - 5;
-        
-        for (int i3=0; i3<=energia; i3++)
-        {
-            if (acciones[plataformas][i3]<minAccion)
-            {
-                minAccion= acciones[plataformas][i3];
-                ans=String.valueOf(minAccion)+" "+track[plataformas][i3];
-            }
-        }
-    //DEBUGGINGGGG:
-    imprimirMatrizAcciones(acciones);
-    imprimirMatrizTrack(track);
-    
 
         return ans;
     }
 
-     /* 
+     
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
@@ -199,19 +166,19 @@ public class copiaLab
         }
         sc.close();
     }
-    */
+    /* 
 
     
     public static void main(String[] args) {
         //Scanner sc = new Scanner(System.in);
         //int ncasos = Integer.parseInt(sc.nextLine());
 
-        int n = 9;
+        int n = 14;
         int e = 2;
 
         String[] plataforma = new String[n+1];
 
-        String[] robots = "4 5 7".split(" ");
+        String[] robots = "4 5 7 9 10 12".split(" ");
 
         for (int i1 =0; i1 < plataforma.length; i1++)
         {
@@ -222,7 +189,7 @@ public class copiaLab
             plataforma[Integer.parseInt(robot)] = "R";
         }
 
-        String[] powerUps = "1 4 3 3 6 5".split(" ");
+        String[] powerUps = "1 7 3 2 6 5 11 3".split(" ");
         for (int i =0; i < powerUps.length;){
             plataforma[Integer.parseInt(powerUps[i])] = powerUps[i+1];
             i+=2;
@@ -231,75 +198,7 @@ public class copiaLab
 
         String ans = laberinto(n,e, plataforma);
         System.out.println(ans);
-        
     }
-
-
-    public static void imprimirMatrizTrack(String[][] track) {
-        int plataformas = track.length;
-        int energiaMax = track[0].length;
-    
-        // Encabezado de columnas
-        System.out.print("          ");
-        for (int energia = 0; energia < energiaMax; energia++) {
-            System.out.printf("Energía %-3d", energia);
-        }
-        System.out.println();
-    
-        // Separador
-        System.out.print("          ");
-        for (int energia = 0; energia < energiaMax; energia++) {
-            System.out.print("-----------");
-        }
-        System.out.println();
-    
-        // Filas (plataformas)
-        for (int plataforma = 0; plataforma < plataformas; plataforma++) {
-            System.out.printf("Plataforma %-2d|", plataforma);
-            for (int energia = 0; energia < energiaMax; energia++) {
-                String paso = (track[plataforma][energia] == null || track[plataforma][energia].isEmpty())
-                    ? "--"
-                    : track[plataforma][energia].trim();
-                if (paso.length() > 9) paso = paso.substring(paso.length() - 9);
-                System.out.printf(" %-9s", paso);
-            }
-            System.out.println();
-        }
-    }
-
-    
-    public static void imprimirMatrizAcciones(int[][] acciones) {
-        int filas = acciones.length;
-        int cols = acciones[0].length;
-    
-        // Encabezado de columnas (energía)
-        System.out.print("     ");
-        for (int j = 0; j < cols; j++) {
-            System.out.printf("E%2d ", j);
-        }
-        System.out.println();
-    
-        // Separador
-        System.out.print("     ");
-        for (int j = 0; j < cols; j++) {
-            System.out.print("----");
-        }
-        System.out.println();
-    
-        // Filas (plataformas)
-        for (int i = 0; i < filas; i++) {
-            System.out.printf("P%2d |", i);  // Etiqueta de fila
-            for (int j = 0; j < cols; j++) {
-                if (acciones[i][j] == Integer.MAX_VALUE - 100000) {
-                    System.out.print("  ∞ "); // Opcional: símbolo de infinito
-                } else {
-                    System.out.printf("%3d ", acciones[i][j]);
-                }
-            }
-            System.out.println();
-        }
-    }
-    
-        
+        */
         
 }
