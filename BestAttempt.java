@@ -27,21 +27,21 @@ public class BestAttempt {
     }
 
     public static String laberinto(int plataformas, int energia, String[] plataforma) {
-        // OptimizaciÃ³n inicial para teletransporte directo
+        // optimizar para teletransporte directo
         if (energia >= plataformas && !plataforma[plataformas].equals("R")) {
             return "1 T" + plataformas;
         }
 
-        // Crear grafo optimizado
+        //creo el grafo
         ArrayList<ArrayList<Edge>> grafo = crearGrafo(plataformas, energia, plataforma);
         
-        // BFS optimizado con poda
+        // BFS optimizado con prioridad
         PriorityQueue<Estado> cola = new PriorityQueue<>((a, b) -> {
             if (a.costo != b.costo) return Integer.compare(a.costo, b.costo);
             return Integer.compare(a.acciones.size(), b.acciones.size());
         });
         
-        // Cache de estados visitados para poda
+        //estados visitados para evitar ciclos
         Set<String> visitados = new HashSet<>();
         
         cola.offer(new Estado(0, energia, 0, new ArrayList<>()));
@@ -65,7 +65,7 @@ public class BestAttempt {
                 continue;
             }
 
-            // Explorar vecinos de manera eficiente
+            // chequear vecinos un tris eficiente
             for (Edge arista : grafo.get(actual.pos)) {
                 if (actual.energia >= arista.costoEnergia) {
                     List<String> nuevasAcciones = new ArrayList<>(actual.acciones);
@@ -98,7 +98,7 @@ public class BestAttempt {
         for (int i = 0; i < plataformas; i++) {
             if (plataforma[i].equals("R")) continue;
 
-            // Caminar
+            //caminaar
             if (i + 1 <= plataformas && !plataforma[i + 1].equals("R")) {
                 grafo.get(i).add(new Edge(i, i + 1, 0, "C+"));
             }
@@ -106,7 +106,7 @@ public class BestAttempt {
                 grafo.get(i).add(new Edge(i, i - 1, 0, "C-"));
             }
 
-            // Saltos especiales
+            //saltos especiales ?
             if (!plataforma[i].equals("NA") && !plataforma[i].equals("FIN")) {
                 try {
                     int salto = Integer.parseInt(plataforma[i]);
@@ -121,7 +121,7 @@ public class BestAttempt {
                 }
             }
 
-            // Teletransporte optimizado
+            //teletransporte mejorado
             if (energia > 0) {
                 for (int dist = 1; dist <= Math.min(energia, plataformas - i); dist++) {
                     int destino = i + dist;
@@ -152,7 +152,7 @@ public class BestAttempt {
             String[] plataforma = new String[n + 1];
             Arrays.fill(plataforma, "NA");
             
-            // Leer robots
+            //leer robots
             linea = br.readLine().trim().split(" ");
             for (String robot : linea) {
                 if (!robot.trim().isEmpty()) {
@@ -163,7 +163,7 @@ public class BestAttempt {
                 }
             }
             
-            // Leer poderes
+            //leer poderes
             linea = br.readLine().trim().split(" ");
             for (int i = 0; i < linea.length - 1; i += 2) {
                 int pos = Integer.parseInt(linea[i]);
