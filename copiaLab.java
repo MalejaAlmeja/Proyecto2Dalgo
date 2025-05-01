@@ -4,9 +4,12 @@ import java.util.Scanner;
 
 public class copiaLab
 {
+    
     public static String laberinto(int plataformas, int energia, String[] plataforma){
+
         String ans="NO SE PUEDE";
         final int infinito = Integer.MAX_VALUE - energia - 5;
+
         //En plataforma, los valores posibles son: null (no hay nada), "R" (robot), "k" (plataformas que se pueden saltar) o "FIN" (llegada al villano final)
         //La tabla de acciones es nodo x unidad de energia restante, y el valor adentro es el nÃºmero de acciones mÃ­nimas en pos 0, y acciones en pos 1
         int [][] acciones = new int[plataformas+1][energia+1];
