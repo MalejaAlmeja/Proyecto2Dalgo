@@ -1,5 +1,5 @@
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 import java.util.Scanner;
 
 public class copiaLab
@@ -14,7 +14,10 @@ public class copiaLab
         //La tabla de acciones es nodo x unidad de energia restante, y el valor adentro es el nÃºmero de acciones mÃ­nimas en pos 0, y acciones en pos 1
         int [][] acciones = new int[plataformas+1][energia+1];
         String [][] track = new String[plataformas+1][energia+1];
-        Queue<int[]> cola = new LinkedList<>();
+        PriorityQueue<int[]> cola = new PriorityQueue<>(
+            Comparator.<int[]>comparingInt(a -> acciones[a[0]][a[1]])
+                      .thenComparingInt(a -> -a[1])
+        );
         //Cada elemento/nodo en la cola tiene la estructura (posicion actual, energia restante)
         //Inicializo la tabla de acciones
         for (int i = 0; i <= plataformas; i++)
@@ -53,18 +56,18 @@ public class copiaLab
                 int plataformaAdelante = origen+1;
                 if (plataformaAtras >= 1 && !plataforma[plataformaAtras].equals("R"))
                 {
-                    if (acciones[plataformaAtras][energiaRestante] > acciones[origen][energiaRestante]+1)
+                    if (acciones[plataformaAtras][energiaRestante] > acc+1)
                     {
-                        acciones[plataformaAtras][energiaRestante]=acciones[origen][energiaRestante]+1;
+                        acciones[plataformaAtras][energiaRestante]=acc+1;
                         track[plataformaAtras][energiaRestante]=track[origen][energiaRestante]+"C- ";
                         cola.add(new int[]{plataformaAtras, energiaRestante});
                     }
                 }
                 if (plataformaAdelante <= plataformas && !plataforma[plataformaAdelante].equals("R"))
                 {
-                    if (acciones[plataformaAdelante][energiaRestante] > acciones[origen][energiaRestante]+1)
+                    if (acciones[plataformaAdelante][energiaRestante] > acc+1)
                     {
-                        acciones[plataformaAdelante][energiaRestante]=acciones[origen][energiaRestante]+1;
+                        acciones[plataformaAdelante][energiaRestante]=acc+1;
                         track[plataformaAdelante][energiaRestante]=track[origen][energiaRestante]+"C+ ";
                         cola.add(new int[]{plataformaAdelante, energiaRestante});
                     }
@@ -79,18 +82,18 @@ public class copiaLab
 
                 if (plataformaAtras >= 1 && !plataforma[plataformaAtras].equals("R"))
                 {
-                    if (acciones[plataformaAtras][energiaRestante] > acciones[origen][energiaRestante]+1)
+                    if (acciones[plataformaAtras][energiaRestante] > acc+1)
                     {
-                        acciones[plataformaAtras][energiaRestante]=acciones[origen][energiaRestante]+1;
+                        acciones[plataformaAtras][energiaRestante]=acc+1;
                         track[plataformaAtras][energiaRestante]=track[origen][energiaRestante]+"S- ";
                         cola.add(new int[]{plataformaAtras, energiaRestante});
                     }
                 }
                 if (plataformaAdelante <= plataformas && !plataforma[plataformaAdelante].equals("R"))
                 {
-                    if (acciones[plataformaAdelante][energiaRestante] > acciones[origen][energiaRestante]+1)
+                    if (acciones[plataformaAdelante][energiaRestante] > acc+1)
                     {
-                        acciones[plataformaAdelante][energiaRestante]=acciones[origen][energiaRestante]+1;
+                        acciones[plataformaAdelante][energiaRestante]=acc+1;
                         track[plataformaAdelante][energiaRestante]=track[origen][energiaRestante]+"S+ ";
                         cola.add(new int[]{plataformaAdelante, energiaRestante});
                     }
@@ -106,19 +109,19 @@ public class copiaLab
                     int plataformaAtras = origen-iE;
                     if (plataformaAdelante <= plataformas && !plataforma[plataformaAdelante].equals("R"))
                     {
-                        if (acciones[plataformaAdelante][energiaRestante-iE] > acciones[origen][iE]+1)
+                        if (acciones[plataformaAdelante][energiaRestante-iE] > acc+1)
                         {
-                            acciones[plataformaAdelante][energiaRestante-iE]=acciones[origen][iE]+1;
-                            track[plataformaAdelante][energiaRestante-iE]=track[origen][iE]+"T"+iE+" ";
+                            acciones[plataformaAdelante][energiaRestante-iE]=acc+1;
+                            track[plataformaAdelante][energiaRestante-iE]=track[origen][energiaRestante]+"T"+iE+" ";
                             cola.add(new int[]{plataformaAdelante, energiaRestante-iE});
                         }
                     }
                     if (plataformaAtras >= 1 && !plataforma[plataformaAtras].equals("R"))
                     {
-                        if (acciones[plataformaAtras][energiaRestante-iE] > acciones[origen][iE]+1)
+                        if (acciones[plataformaAtras][energiaRestante-iE] > acc+1)
                         {
-                            acciones[plataformaAtras][energiaRestante-iE]=acciones[origen][iE]+1;
-                            track[plataformaAtras][energiaRestante-iE]=track[origen][iE]+"T-"+iE+" ";
+                            acciones[plataformaAtras][energiaRestante-iE]=acc+1;
+                            track[plataformaAtras][energiaRestante-iE]=track[origen][energiaRestante]+"T-"+iE+" ";
                             cola.add(new int[]{plataformaAtras, energiaRestante-iE});
                         }
                     }
