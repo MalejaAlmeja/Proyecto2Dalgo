@@ -49,15 +49,9 @@ public class BestAttempt {
     }
 
     public static String laberinto(int plataformas, int energia, String[] plataforma) {
-        if (energia >= plataformas) {
-            boolean hayRobot = false;
-            for (int i = 1; i <= plataformas; i++) {
-                if ("R".equals(plataforma[i])) {
-                    hayRobot = true;
-                    break;
-                }
-            }
-            if (!hayRobot) return "1 T" + plataformas;
+        if (energia >= plataformas)
+        { 
+            return "1 T" + plataformas;
         }
 
         ArrayList<ArrayList<Edge>> grafo = crearGrafo(plataformas, energia, plataforma);
