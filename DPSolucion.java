@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Scanner;
 
 public class DPSolucion 
 {
@@ -18,81 +15,108 @@ public class DPSolucion
        int [][][] dist = new int[plataformas+1][energia+1][plataformas+1];
 
        //Inicializo matriz de distancias
-        for (int nodo=0; nodo<=plataformas; nodo++)
-        {   
-            for (int iEnergia1=0; iEnergia1<=energia; iEnergia1++)
-            {
-                int valorSalto=0;
-                int distNodo=plataformas-nodo;
+       for (int intermediario=0; intermediario<=plataformas; intermediario++)
+       {
+            for (int nodo=0; nodo<=plataformas; nodo++)
+            {   
+                for (int iEnergia1=0; iEnergia1<=energia; iEnergia1++)
+                {
+                    dist[nodo][iEnergia1][intermediario]=Integer.MAX_VALUE - energia - 5;
 
-                if (nodo==plataformas)
-                {
-                    dist[nodo][iEnergia1][0]=0;
-                }
-                else if (!plataforma[nodo].equals("R"))
-                {
-                    //Chequeo si tiene salto
-                    if (!plataforma[nodo].equals("R") && !plataforma[nodo].equals("NA"))
+                    if (intermediario==0)
                     {
-                        valorSalto=Integer.valueOf(plataforma[nodo]);
+                        int valorSalto=0;
+                        int distNodo=plataformas-nodo;
+
+                        if (nodo==plataformas)
+                        {
+                            dist[plataformas][iEnergia1][intermediario]=0;
+                        }
+                        else if (!plataforma[nodo].equals("R"))
+                        {
+                            //Chequeo si tiene salto
+                            if (!plataforma[nodo].equals("R") && !plataforma[nodo].equals("NA"))
+                            {
+                                valorSalto=Integer.valueOf(plataforma[nodo]);
+                            }
+                        
+                            //Si se puede saltar o caminar, energia 0 
+                            if ( (nodo==plataformas-1 || valorSalto== plataformas-nodo ) && iEnergia1==energia)
+                            {
+                                dist[nodo][iEnergia1][0]=1;
+                            }
+                            //Si se puede teletransportar
+                            else if (iEnergia1==energia-distNodo)
+                            {   
+                                dist[nodo][iEnergia1][0]=1;
+                            }
+                        }
                     }
-                   
-                    //Si se puede saltar o caminar, energia 0 
-                    if ( (nodo==plataformas-1 || valorSalto== plataformas-nodo ) && iEnergia1==energia)
-                    {
-                        dist[nodo][iEnergia1][0]=1;
-                    }
-                    //Si se puede teletransportar
-                    else if (iEnergia1==energia-distNodo)
-                    {   
-                        dist[nodo][iEnergia1][0]=1;
-                    }
-                    //Si es imposible
-                    else
-                    {
-                        dist[nodo][iEnergia1][0]=Integer.MAX_VALUE - energia - 5;
-                    }
-                }
-                else //es imposible
-                {
-                    dist[nodo][iEnergia1][0]=Integer.MAX_VALUE - energia - 5;
                 }
             }
-        }
+       }
 
        //Comienzo DP
-       for (int intermediario=1; intermediario<=plataformas; intermediario++)
+       for (int intermediario=1; intermediario<plataformas; intermediario++)
        {
-           for (int nodoOrigen=0; nodoOrigen<=plataformas; nodoOrigen++)
+           for (int nodoOrigen=0; nodoOrigen<plataformas; nodoOrigen++)
            {
-               for (int iEnergia=0; iEnergia<=energia; iEnergia++)
-               {
-                   int valorOriginal=dist[nodoOrigen][iEnergia][intermediario-1];
+                if (!plataforma[nodoOrigen].equals("R") && !plataforma[intermediario].equals("R"))
+                {
+                    int valorSalto=0;
+                    int distNodo=plataformas-nodoOrigen;
 
-                   if () //se puede saltar o caminar
-                        dist[nodoOrigen][iEnergia][intermediario]=dist[intermediario][iEnergia][intermediario-1]+1;
-                    else if () //se puede teletransoirtar
-                        dist[]
-                        
+                    //Chequeo si tiene salto
+                    if (!plataforma[nodoOrigen].equals("R") && !plataforma[nodoOrigen].equals("NA"))
+                    {
+                        valorSalto=Integer.valueOf(plataforma[nodoOrigen]);
                     }
-               }
+
+                    for (int iEnergia=0; iEnergia<=energia; iEnergia++)
+                    {
+
+                        if (nodoOrigen==intermediario-1 || nodoOrigen==intermediario+1 ||  distNodo==valorSalto) //se puede saltar o caminar
+                        {
+                                if (dist[nodoOrigen][iEnergia][intermediario]>dist[intermediario][iEnergia][intermediario-1]+1)
+                                {
+                                    dist[nodoOrigen][iEnergia][intermediario]=dist[intermediario][iEnergia][intermediario-1]+1;
+                                }
+                        }
+                        if ( iEnergia + distNodo<=energia) //se puede teletransportar
+                            {
+                                if (dist[nodoOrigen][iEnergia][intermediario]>dist[intermediario][iEnergia][intermediario-1]+1)
+                                {
+                                    dist[nodoOrigen][iEnergia][intermediario]=dist[intermediario][iEnergia+distNodo][intermediario-1] +1;
+                                }
+                            }
+                    }
+                }
            }
-       }
+        }
         
         int minAccion= Integer.MAX_VALUE - energia - 5;
         
         for (int i3=0; i3<=energia; i3++)
         {
-            if (acciones[plataformas][i3]<minAccion)
+            if (dist[0][i3][plataformas]<minAccion)
             {
-                minAccion= acciones[plataformas][i3];
-                ans=String.valueOf(minAccion)+" "+track[plataformas][i3];
+                minAccion= dist[0][i3][plataformas];
+                ans=String.valueOf(minAccion);
+                //+" "+track[plataformas][i3];
             }
+        }
+
+        for (int i = 0; i <=energia; i++) {          // Row loop
+            for (int j = 0; j <=plataformas; j++) {      // Column loop
+                System.out.print(dist[j][i][plataformas] + " ");
+            }
+            System.out.println();              // Newline after each row
         }
 
         return ans;
     }
         
+    /* 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
@@ -130,7 +154,7 @@ public class DPSolucion
         }
         sc.close();
     }
-    /* 
+    */ 
 
     
     public static void main(String[] args) {
@@ -158,12 +182,11 @@ public class DPSolucion
             plataforma[Integer.parseInt(powerUps[i])] = powerUps[i+1];
             i+=2;
         }
-        plataforma[n]="FIN";
 
-        String ans = laberinto(n,e, plataforma);
+        String ans = laberinto(n,e, plataforma, robots.length);
         System.out.println(ans);
     }
-        */
+        
         
 }
     
