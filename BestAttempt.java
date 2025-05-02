@@ -2,6 +2,9 @@ import java.io.*;
 import java.util.*;
 
 public class BestAttempt {
+    /*
+     * Clase para poder guardar la info de una arista incluyendo su tipo de manera más sencilla
+     */
     static class Edge {
         int origen, destino, costoEnergia;
         String tipoArista;
@@ -48,6 +51,20 @@ public class BestAttempt {
         }
     }
 
+    /*
+     * Queremos comparar los nodos caminos inicialmente por el costo, pero si son iguales comparamos con energia
+     */
+    static class NodoCaminoComparator implements Comparator<NodoCamino> {
+        @Override
+        public int compare(NodoCamino a, NodoCamino b) 
+        {
+            if (a.costo != b.costo) 
+                return Integer.compare(a.costo, b.costo);
+            else 
+                return Integer.compare(b.estado.energia, a.estado.energia);
+        }
+    }
+
     public static String laberinto(int plataformas, int energia, String[] plataforma) {
         if (energia >= plataformas)
         { 
@@ -56,26 +73,30 @@ public class BestAttempt {
 
         ArrayList<ArrayList<Edge>> grafo = crearGrafo(plataformas, energia, plataforma);
 
-        PriorityQueue<NodoCamino> cola = new PriorityQueue<>((a, b) -> {
-            if (a.costo != b.costo) return Integer.compare(a.costo, b.costo);
-            return Integer.compare(b.estado.energia, a.estado.energia);
-        });
+        PriorityQueue<NodoCamino> cola = new PriorityQueue<>(new NodoCaminoComparator());
 
         Map<Estado, Integer> visitados = new HashMap<>();
 
         Estado inicial = new Estado(0, energia);
-        cola.offer(new NodoCamino(inicial, 0, new ArrayList<>()));
+        cola.add(new NodoCamino(inicial, 0, new ArrayList<>()));
 
         while (!cola.isEmpty()) {
             NodoCamino actual = cola.poll();
             Estado estado = actual.estado;
 
-            if (visitados.containsKey(estado) && visitados.get(estado) <= actual.costo) continue;
-            visitados.put(estado, actual.costo);
-
-            if (estado.pos == plataformas) {
+            //Si ya llegamos a la plataforma final, podemos devolver el camino 
+            if (estado.pos == plataformas) 
+            {
                 return actual.costo + " " + String.join(" ", actual.acciones);
             }
+
+            //Si ya hemos estado en ese Estado a un menor costo del que estamos ahora, saltamos el caso
+            if (visitados.containsKey(estado) && visitados.get(estado) <= actual.costo)
+            { 
+                continue;
+            }
+
+            visitados.put(estado, actual.costo);
 
             for (Edge arista : grafo.get(estado.pos)) {
                 if (estado.energia >= arista.costoEnergia) {
