@@ -101,12 +101,19 @@ public class BestAttempt {
                     //Calculamos cual seria la energia restante si utilizamos esa arista 
                     int nuevaEnergia = actual.energia - arista.costoEnergia;
 
-                    //Guardamos las acciones que tomamos para llegar a ese nuevo camino
-                    List<String> nuevasAcciones = new ArrayList<>(actual.acciones);
-                    nuevasAcciones.add(arista.tipoArista);
+                    if (estadosVisitados[arista.destino][nuevaEnergia]!=-1 && estadosVisitados[arista.destino][nuevaEnergia] <= actual.costo + 1)
+                    {
+                        continue;
+                    }
+                    else 
+                    {
+                        //Guardamos las acciones que tomamos para llegar a ese nuevo camino
+                        List<String> nuevasAcciones = new ArrayList<>(actual.acciones);
+                        nuevasAcciones.add(arista.tipoArista);
 
-                    //Apilamos en la cola el nuevo camino posible que podemos tomar
-                    cola.offer(new NodoCamino(arista.destino, nuevaEnergia, actual.costo + 1, nuevasAcciones));
+                        //Apilamos en la cola el nuevo camino posible que podemos tomar
+                        cola.offer(new NodoCamino(arista.destino, nuevaEnergia, actual.costo + 1, nuevasAcciones));
+                    }
                 }
             }
         }
