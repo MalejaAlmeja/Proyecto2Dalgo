@@ -1,6 +1,12 @@
 import java.io.*;
 import java.util.*;
 
+/*
+ Daniela González: 202320856
+Sofía Arias: 202310260
+María Alejandra Carrillo: 202321854
+ */
+
 public class BestAttempt {
     /*
      * Clase para poder guardar la info de una arista incluyendo su tipo de manera más sencilla
