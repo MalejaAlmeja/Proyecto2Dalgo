@@ -219,37 +219,4 @@ public class BestAttempt {
             System.out.println(laberinto(n, e, plataforma));
         }
     } 
-
-    /* 
-    public static void main(String[] args) {
-        //Scanner sc = new Scanner(System.in);
-        //int ncasos = Integer.parseInt(sc.nextLine());
-
-        int n = 9;
-        int e = 2;
-
-        String[] plataforma = new String[n+1];
-
-        String[] robots = "4 5 7 9 10 12".split(" ");
-
-        for (int i1 =0; i1 < plataforma.length; i1++)
-        {
-            plataforma[i1]="NA";
-        }
-        
-        for (String robot: robots) {
-            plataforma[Integer.parseInt(robot)] = "R";
-        }
-
-        String[] powerUps = "1 7 3 2 6 5 11 3".split(" ");
-        for (int i =0; i < powerUps.length;){
-            plataforma[Integer.parseInt(powerUps[i])] = powerUps[i+1];
-            i+=2;
-        }
-        plataforma[n]="FIN";
-
-        String ans = laberinto(n,e, plataforma);
-        System.out.println(ans);
-    }
-        */
 }
