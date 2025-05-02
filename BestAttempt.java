@@ -17,49 +17,20 @@ public class BestAttempt {
         }
     }
 
-    /*
-     * Clase para guardar con cuanta energia llegamos a una plataforma
-     */
-    static class Estado {
-        int pos, energia;
-
-        public Estado(int pos, int energia) {
-            this.pos = pos;
-            this.energia = energia;
-        }
-
-        //Los estados seran llaves en el hashmap, entonces tenemos que sobreescribir el equal y hash code
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) 
-                return true;
-
-            if (!(o instanceof Estado)) 
-                return false;
-
-            Estado e = (Estado) o;
-
-            return pos == e.pos && energia == e.energia;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(pos, energia);
-        }
-    }
-
     /* 
-    * Clase para poder guardar el camino que tomamos para llegar a un nodo
+    * Clase para poder guardar el camino que tomamos para llegar a un nodo y la cantidad de energia que nos queda
     */
     static class NodoCamino {
-        Estado estado;
+        int energia;
+        int numNodo;
         int costo;
         List<String> acciones;
 
-        public NodoCamino(Estado estado, int costo, List<String> acciones) {
-            this.estado = estado;
+        public NodoCamino(int numNodo, int energia, int costo, List<String> acciones) {
+            this.energia = energia;
             this.costo = costo;
             this.acciones = acciones;
+            this.numNodo = numNodo;
         }
     }
 
@@ -89,47 +60,54 @@ public class BestAttempt {
         //Creamos una cola de prioridad para priorizar los caminos más cortos
         PriorityQueue<NodoCamino> cola = new PriorityQueue<>(new NodoCaminoComparator());
 
-        //Necesitamos guardar los estados que ya visitamos para ahorrar el calculo de ellos
-        Map<Estado, Integer> visitados = new HashMap<>();
+        //Necesitamos guardar los estados de las plataformas que ya visitamos para ahorrar el calculo de ellos, y guardaremos el costo mínimo para llegar a ese estado
+        int [][] estadosVisitados = new int[plataformas + 1][energia + 1];
 
-        Estado inicial = new Estado(0, energia);
-        cola.add(new NodoCamino(inicial, 0, new ArrayList<>()));
+        //Inicialiazamos la tabla de visitados con -1 que indica que no hemos visitado ese estado
+        for(int i = 0; i < estadosVisitados.length; i++)
+        {
+            for(int j = 0; j < estadosVisitados[i].length; j++)
+            {
+                estadosVisitados[i][j] = -1;
+            }
+        }
+
+        estadosVisitados[0][energia] = 0;
+        cola.add(new NodoCamino(0, energia, 0, new ArrayList<>()));
 
         while (!cola.isEmpty()) {
             NodoCamino actual = cola.poll();
-            Estado estado = actual.estado;
 
-            //Si ya llegamos a la plataforma final, como es priority queue podemos devolver el camino más corto
-            if (estado.pos == plataformas) 
+            //Si ya llegamos a la plataforma final, como es priority queue podemos devolver el camino más corto automaticamente
+            if (actual.numNodo == plataformas) 
             {
                 return actual.costo + " " + String.join(" ", actual.acciones);
             }
 
             //Si ya hemos estado en esta plataforma a un menor costo del que estamos ahora y con la misma cantidad de energia, saltamos el caso
-            if (visitados.containsKey(estado) && visitados.get(estado) <= actual.costo)
+            if (estadosVisitados[actual.numNodo][actual.energia]!=-1 && estadosVisitados[actual.numNodo][actual.energia] <= actual.costo)
             { 
                 continue;
             }
 
             //Marcamos el nuevo estado en el que estamos con el costo que tenemos
-            visitados.put(estado, actual.costo);
+            estadosVisitados[actual.numNodo][actual.energia]=actual.costo;
 
             //Recorremos las aristas que salen de la plataforma en la que estamos para crear los posibles caminos
-            for (Edge arista : grafo.get(estado.pos)) 
+            for (Edge arista : grafo.get(actual.numNodo)) 
             {
                 //Solo consideramos la arista si tenemos suficiente energia para ella
-                if (estado.energia >= arista.costoEnergia) 
+                if (actual.energia >= arista.costoEnergia) 
                 {
-                    //Para crear el estado sacamos cual seria la energia restante si utilizamos esa arista 
-                    int nuevaEnergia = estado.energia - arista.costoEnergia;
-                    Estado nuevoEstado = new Estado(arista.destino, nuevaEnergia);
+                    //Calculamos cual seria la energia restante si utilizamos esa arista 
+                    int nuevaEnergia = actual.energia - arista.costoEnergia;
 
-                    //Guardamos las acciones que tomamos para llegar a ese nuevo estado
+                    //Guardamos las acciones que tomamos para llegar a ese nuevo camino
                     List<String> nuevasAcciones = new ArrayList<>(actual.acciones);
                     nuevasAcciones.add(arista.tipoArista);
 
                     //Apilamos en la cola el nuevo camino posible que podemos tomar
-                    cola.offer(new NodoCamino(nuevoEstado, actual.costo + 1, nuevasAcciones));
+                    cola.offer(new NodoCamino(arista.destino, nuevaEnergia, actual.costo + 1, nuevasAcciones));
                 }
             }
         }
