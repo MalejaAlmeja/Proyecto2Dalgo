@@ -1,95 +1,104 @@
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.PriorityQueue;
 import java.util.Scanner;
 
 public class copiaLab
 {
+    static class Nodo implements Comparable<Nodo> {
+        int origen;
+        int energiaRestante;
+        int acciones;
+        String camino;
+
+        Nodo(int origen, int energiaRestante, int acciones, String camino){
+            this.origen=origen;
+            this.energiaRestante=energiaRestante;
+            this.acciones=acciones;
+            this.camino=camino;}
+        
+        @Override
+        public int compareTo(Nodo o) {
+            int menor = Integer.compare(this.acciones, o.acciones);
+            if (menor != 0) return menor;
+            return Integer.compare(o.energiaRestante, this.energiaRestante);
+        }
+        }
+    
     public static String laberinto(int plataformas, int energia, String[] plataforma){
+
         String ans="NO SE PUEDE";
         final int infinito = Integer.MAX_VALUE - energia - 5;
-        //En plataforma, los valores posibles son: null (no hay nada), "R" (robot), "k" (plataformas que se pueden saltar) o "FIN" (llegada al villano final)
-        //La tabla de acciones es nodo x unidad de energia restante, y el valor adentro es el nÃºmero de acciones mÃ­nimas en pos 0, y acciones en pos 1
+        //En plataforma, los valores posibles son: NA (no hay nada), "R" (robot), "k" (plataformas que se pueden saltar) o "FIN" (llegada al villano final)
+        //La tabla de acciones es nodo x unidad de energia restante, y el valor adentro es el nÃºmero de acciones mÃ­nimas
         int [][] acciones = new int[plataformas+1][energia+1];
-        String [][] track = new String[plataformas+1][energia+1];
-        Queue<int[]> cola = new LinkedList<>();
+        PriorityQueue<Nodo> cola = new PriorityQueue<>();
         //Cada elemento/nodo en la cola tiene la estructura (posicion actual, energia restante)
         //Inicializo la tabla de acciones
         for (int i = 0; i <= plataformas; i++)
         {
             for (int j = 0; j <= energia; j++)
             {
-                if (i==0)
-                {
-                    acciones[i][j]=0;
-                    track[i][j]="";
-                }
-                else
-                {
-                    acciones[i][j]=infinito;
-                    track[i][j]="";
-                }
+                if (i==0){acciones[i][j]=0;}
+                else{acciones[i][j]=infinito;}
             }
         }
 
         //BFS
-        cola.add(new int[]{0,energia});
+        cola.add(new Nodo(0, energia, 0, ""));
         while (!cola.isEmpty())
         {
-            int[] plataformaActual= cola.remove();
-            int origen= plataformaActual[0];
-            int energiaRestante= plataformaActual[1];
-            int acc= acciones[origen][energiaRestante];
+            Nodo plataformaActual = cola.remove();
+            int origen = plataformaActual.origen;
+            int energiaRestante = plataformaActual.energiaRestante;
+            int acc = plataformaActual.acciones;
+            String camino = plataformaActual.camino;
+            String tipoPlataforma = plataforma[origen];
 
             //Llegamos al final
-            if (plataforma[origen].equals("FIN")){return acc + " " + track[origen][energiaRestante].trim();}
+            if (tipoPlataforma.equals("FIN")){return acc + " " + camino.trim();}
             
             //AÃ±ado aristas sin powerup
-            if (plataforma[origen].equals("NA") ||  (!plataforma[origen].equals("R") && !plataforma[origen].equals("FIN")))
+            if (tipoPlataforma.equals("NA") ||  (!tipoPlataforma.equals("R") && !tipoPlataforma.equals("FIN")))
             {
                 int plataformaAtras = origen-1;
                 int plataformaAdelante = origen+1;
                 if (plataformaAtras >= 1 && !plataforma[plataformaAtras].equals("R"))
                 {
-                    if (acciones[plataformaAtras][energiaRestante] > acciones[origen][energiaRestante]+1)
+                    if (acciones[plataformaAtras][energiaRestante] > acc+1)
                     {
-                        acciones[plataformaAtras][energiaRestante]=acciones[origen][energiaRestante]+1;
-                        track[plataformaAtras][energiaRestante]=track[origen][energiaRestante]+"C- ";
-                        cola.add(new int[]{plataformaAtras, energiaRestante});
+                        acciones[plataformaAtras][energiaRestante]=acc+1;
+                        cola.add(new Nodo(plataformaAtras, energiaRestante, acc+1, camino+"C- "));
                     }
                 }
                 if (plataformaAdelante <= plataformas && !plataforma[plataformaAdelante].equals("R"))
                 {
-                    if (acciones[plataformaAdelante][energiaRestante] > acciones[origen][energiaRestante]+1)
+                    if (acciones[plataformaAdelante][energiaRestante] > acc+1)
                     {
-                        acciones[plataformaAdelante][energiaRestante]=acciones[origen][energiaRestante]+1;
-                        track[plataformaAdelante][energiaRestante]=track[origen][energiaRestante]+"C+ ";
-                        cola.add(new int[]{plataformaAdelante, energiaRestante});
+                        acciones[plataformaAdelante][energiaRestante]=acc+1;
+                        cola.add(new Nodo(plataformaAdelante, energiaRestante, acc+1, camino+"C+ "));
                     }
                 }
             }
 
             //Añado aristas con powerup
-            if (!plataforma[origen].equals("NA") && !plataforma[origen].equals("R") && !plataforma[origen].equals("FIN"))
+            if (!tipoPlataforma.equals("NA") && !tipoPlataforma.equals("R") && !tipoPlataforma.equals("FIN"))
             {
-                int plataformaAtras = origen-Integer.parseInt(plataforma[origen]);
-                int plataformaAdelante = origen+Integer.parseInt(plataforma[origen]);
+                int plataformaAtras = origen-Integer.parseInt(tipoPlataforma);
+                int plataformaAdelante = origen+Integer.parseInt(tipoPlataforma);
 
                 if (plataformaAtras >= 1 && !plataforma[plataformaAtras].equals("R"))
                 {
-                    if (acciones[plataformaAtras][energiaRestante] > acciones[origen][energiaRestante]+1)
+                    if (acciones[plataformaAtras][energiaRestante] > acc+1)
                     {
-                        acciones[plataformaAtras][energiaRestante]=acciones[origen][energiaRestante]+1;
-                        track[plataformaAtras][energiaRestante]=track[origen][energiaRestante]+"S- ";
-                        cola.add(new int[]{plataformaAtras, energiaRestante});
+                        acciones[plataformaAtras][energiaRestante]=acc+1;
+                        cola.add(new Nodo(plataformaAtras, energiaRestante, acc+1, camino+"S- "));
                     }
                 }
                 if (plataformaAdelante <= plataformas && !plataforma[plataformaAdelante].equals("R"))
                 {
-                    if (acciones[plataformaAdelante][energiaRestante] > acciones[origen][energiaRestante]+1)
+                    if (acciones[plataformaAdelante][energiaRestante] > acc+1)
                     {
-                        acciones[plataformaAdelante][energiaRestante]=acciones[origen][energiaRestante]+1;
-                        track[plataformaAdelante][energiaRestante]=track[origen][energiaRestante]+"S+ ";
-                        cola.add(new int[]{plataformaAdelante, energiaRestante});
+                        acciones[plataformaAdelante][energiaRestante]=acc+1;
+                        cola.add(new Nodo(plataformaAdelante, energiaRestante, acc+1, camino+"S+ "));
                     }
                 }
             }
@@ -101,22 +110,21 @@ public class copiaLab
                 {
                     int plataformaAdelante = origen+iE;
                     int plataformaAtras = origen-iE;
+                    int energiaActual = energiaRestante-iE;
                     if (plataformaAdelante <= plataformas && !plataforma[plataformaAdelante].equals("R"))
                     {
-                        if (acciones[plataformaAdelante][energiaRestante-iE] > acciones[origen][iE]+1)
+                        if (acciones[plataformaAdelante][energiaRestante-iE] > acc+1)
                         {
-                            acciones[plataformaAdelante][energiaRestante-iE]=acciones[origen][iE]+1;
-                            track[plataformaAdelante][energiaRestante-iE]=track[origen][iE]+"T"+iE+" ";
-                            cola.add(new int[]{plataformaAdelante, energiaRestante-iE});
+                            acciones[plataformaAdelante][energiaRestante-iE]=acc+1;
+                            cola.add(new Nodo(plataformaAdelante,energiaActual,acc+1,camino+"T"+iE+" "));
                         }
                     }
                     if (plataformaAtras >= 1 && !plataforma[plataformaAtras].equals("R"))
                     {
-                        if (acciones[plataformaAtras][energiaRestante-iE] > acciones[origen][iE]+1)
+                        if (acciones[plataformaAtras][energiaRestante-iE] > acc+1)
                         {
-                            acciones[plataformaAtras][energiaRestante-iE]=acciones[origen][iE]+1;
-                            track[plataformaAtras][energiaRestante-iE]=track[origen][iE]+"T-"+iE+" ";
-                            cola.add(new int[]{plataformaAtras, energiaRestante-iE});
+                            acciones[plataformaAtras][energiaRestante-iE]=acc+1;
+                            cola.add(new Nodo(plataformaAtras,energiaActual,acc+1,camino+"T-"+iE+" "));
                         }
                     }
                     
