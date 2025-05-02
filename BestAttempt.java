@@ -44,7 +44,7 @@ public class BestAttempt {
             if (a.costo != b.costo) 
                 return Integer.compare(a.costo, b.costo);
             else 
-                return Integer.compare(b.estado.energia, a.estado.energia);
+                return Integer.compare(b.energia, a.energia);
         }
     }
 
