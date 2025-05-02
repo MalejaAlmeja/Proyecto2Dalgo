@@ -66,6 +66,7 @@ public class BestAttempt {
     }
 
     public static String laberinto(int plataformas, int energia, String[] plataforma) {
+        //Caso de cuando tenemos suficiente energia para llegar a la meta en una sola teletransportación
         if (energia >= plataformas)
         { 
             return "1 T" + plataformas;
@@ -96,14 +97,22 @@ public class BestAttempt {
                 continue;
             }
 
+            //Marcamos el estado en el que estamos con el costo que encontramos
             visitados.put(estado, actual.costo);
 
-            for (Edge arista : grafo.get(estado.pos)) {
-                if (estado.energia >= arista.costoEnergia) {
+            for (Edge arista : grafo.get(estado.pos)) 
+            {
+                if (estado.energia >= arista.costoEnergia) 
+                {
+                    //Sacamos la energia restante si utilizamos esa arista
                     int nuevaEnergia = estado.energia - arista.costoEnergia;
                     Estado nuevoEstado = new Estado(arista.destino, nuevaEnergia);
+
+                    //Guardamos las acciones que tomamos para llegar a ese nuevo estado
                     List<String> nuevasAcciones = new ArrayList<>(actual.acciones);
                     nuevasAcciones.add(arista.tipoArista);
+
+                    //Apilamos en la cola el nuevo nodoCamino posible
                     cola.offer(new NodoCamino(nuevoEstado, actual.costo + 1, nuevasAcciones));
                 }
             }
@@ -114,45 +123,56 @@ public class BestAttempt {
 
     private static ArrayList<ArrayList<Edge>> crearGrafo(int plataformas, int energia, String[] plataforma) {
         ArrayList<ArrayList<Edge>> grafo = new ArrayList<>(plataformas + 1);
-        for (int i = 0; i <= plataformas; i++) {
-            grafo.add(new ArrayList<>());
-        }
 
-        for (int i = 0; i <= plataformas; i++) {
-            if ("R".equals(plataforma[i])) continue;
+        for (int i = 0; i <= plataformas; i++) 
+        {
+            grafo.add(i, new ArrayList<>());
 
-            if (i + 1 <= plataformas && !"R".equals(plataforma[i + 1])) {
+            if ("R".equals(plataforma[i])) 
+                continue;
+
+            //Añadimos aristas de caminar adelante y atras
+            if (i + 1 <= plataformas && !"R".equals(plataforma[i + 1])) 
+            {
                 grafo.get(i).add(new Edge(i, i + 1, 0, "C+"));
             }
-            if (i > 0 && !"R".equals(plataforma[i - 1])) {
+            if (i > 0 && !"R".equals(plataforma[i - 1]))
+            {
                 grafo.get(i).add(new Edge(i, i - 1, 0, "C-"));
             }
 
-            if (!"NA".equals(plataforma[i]) && !"FIN".equals(plataforma[i])) {
-                try {
-                    int salto = Integer.parseInt(plataforma[i]);
-                    if (i + salto <= plataformas && !"R".equals(plataforma[i + salto])) {
-                        grafo.get(i).add(new Edge(i, i + salto, 0, "S+"));
-                    }
-                    if (i - salto >= 0 && !"R".equals(plataforma[i - salto])) {
-                        grafo.get(i).add(new Edge(i, i - salto, 0, "S-"));
-                    }
-                } catch (NumberFormatException ignored) {}
-            }
+            //Añadimos aristas de salto
+            if (!"NA".equals(plataforma[i]) && !"FIN".equals(plataforma[i])) 
+            {
+                int salto = Integer.valueOf(plataforma[i]);
 
-            if (energia > 0) {
-                for (int dist = 1; dist <= energia; dist++) {
-                    int adelante = i + dist;
-                    if (adelante <= plataformas && !"R".equals(plataforma[adelante])) {
-                        grafo.get(i).add(new Edge(i, adelante, dist, "T" + dist));
-                    }
-                    int atras = i - dist;
-                    if (atras >= 0 && !"R".equals(plataforma[atras])) {
-                        grafo.get(i).add(new Edge(i, atras, dist, "T-" + dist));
-                    }
+                if (i + salto <= plataformas && !"R".equals(plataforma[i + salto])) 
+                {
+                    grafo.get(i).add(new Edge(i, i + salto, 0, "S+"));
+                }
+                if (i - salto >= 0 && !"R".equals(plataforma[i - salto])) 
+                {
+                    grafo.get(i).add(new Edge(i, i - salto, 0, "S-"));
                 }
             }
+
+            //Añadimos aristas de teletransportación
+            for (int dist = 2; dist <= energia; dist++) 
+            {
+                int adelante = i + dist;
+                if (adelante <= plataformas && !"R".equals(plataforma[adelante])) 
+                {
+                    grafo.get(i).add(new Edge(i, adelante, dist, "T" + dist));
+                }
+                int atras = i - dist;
+                if (atras >= 0 && !"R".equals(plataforma[atras])) 
+                {
+                    grafo.get(i).add(new Edge(i, atras, dist, "T-" + dist));
+                }
+            }
+            
         }
+        
         return grafo;
     }
 
