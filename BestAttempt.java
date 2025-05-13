@@ -1,3 +1,7 @@
+//Daniela González: 202320856 
+//Sofía Arias: 202310260 
+//María Alejandra Carrillo: 202321854 
+
 import java.io.*;
 import java.util.*;
 
